@@ -1,51 +1,60 @@
 {% extends 'base.html' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Registro{% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
-        <div class="col-md-6">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg p-4">
             <h2 class="text-center mb-4">Crea tu cuenta</h2>
+
+            <!-- Mensaje de éxito -->
             {% if mensaje_ok %}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>{{mensaje_ok}}</strong>
+                <strong>{{ mensaje_ok }}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endif %}
+
+            <!-- Mensaje de error -->
             {% if mensaje_no %}
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>{{mensaje_no}}</strong>
+                <strong>{{ mensaje_no }}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endif %}
-            <form action="/register" method="POST">
+
+            <!-- Formulario de registro -->
+            <form action="{{ url_for('register') }}" method="POST">
                 <div class="mb-3">
                     <label for="nombre" class="form-label">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Introduce tu nombre" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="apellido" class="form-label">Apellido</label>
-                    <input type="text" class="form-control" id="apellido" name="apellido" required>
+                    <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Introduce tu apellido" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="ejemplo@correo.com" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="contraseña" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="contraseña" name="contraseña" required>
+                    <input type="password" class="form-control" id="contraseña" name="contraseña" placeholder="Introduce tu contraseña" required>
                 </div>
 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary btn-lg">Registrarme</button>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Registrarme</button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <p>¿Ya tienes cuenta? <a href="{{ url_for('loger') }}">Inicia sesión aquí</a></p>
                 </div>
             </form>
         </div>
     </div>
-
-
-
+</div>
 {% endblock %}
