@@ -5,8 +5,6 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 #Importacion para generar seguridad en las contraseñas de los usuarios usando Hash
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
-
 app = Flask(__name__)
 
 #Clave secreta
@@ -118,6 +116,11 @@ def loger():
 def logout():
     logout_user()
     return render_template('index')
+
+@app.route('/perfil', methods=['GET', 'POST'])
+@login_required
+def perfil():
+    return render_template('perfil.html')
 
         
 if __name__ == "__main__":
