@@ -1,0 +1,23 @@
+-- Crear la base de datos
+CREATE DATABASE gestor_contactos;
+
+-- Usar la base de datos creada
+USE gestor_contactos;
+
+-- Crear la tabla Usuario
+CREATE TABLE Usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    email VARCHAR(120) UNIQUE NOT NULL,
+    contraseña VARCHAR(200) NOT NULL
+);
+
+-- Crear la tabla Contactos
+CREATE TABLE Contacto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    email VARCHAR(120) UNIQUE NOT NULL,
+    telefono numeric UNIQUE NOT NULL
+);

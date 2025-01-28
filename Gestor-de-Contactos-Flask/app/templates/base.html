@@ -14,9 +14,13 @@
             </div>
 
             <form class="d-flex" role="search">
-                <a class="navbar-brand" href="/register">Registrarse</a>
-                <a class="navbar-brand" href="/loger">Iniciar Sesion</a>
-                
+                {% if current_user.is_authenticated %}
+                    <a class="navbar-brand" href="/perfil">Perfil</a>
+                    <a class="navbar-brand" href="/logout">Cerrar Sesión</a>
+                {% else %}
+                    <a class="navbar-brand" href="/register">Registrarse</a>
+                    <a class="navbar-brand" href="/loger">Iniciar Sesión</a>
+                {% endif %} 
             </form>
         </nav>
     </header>

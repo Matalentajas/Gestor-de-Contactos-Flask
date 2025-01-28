@@ -1,10 +1,27 @@
-{% extend 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Perfil{% endblock %}
 
 {% block content %}
 <div class="profile">
-    <h1>{{ user.name }}</h1>
+    <h1>{{ user.nombre }}</h1>
     <p>Email: {{ user.email }}</p>
 </div>
+
+<section class="navbar navbar-expand-lg bg-info bg-opacity-25">
+    <!-- Nav de contactos -->
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Añadir Contacto</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Buscar Contacto" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Buscar</button>
+        </form>
+    </div>
+    <!-- Fin Nav Contactos -->
+
+    
+</section>
 {% endblock %}

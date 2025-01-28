@@ -42,6 +42,8 @@ def load_user(user_id):
 ##HOME
 @app.route('/')
 def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('perfil'))
     return render_template('index.html')
 
 ##REGISTO
@@ -96,17 +98,18 @@ def loger():
         
         if email and contraseña:
             cursor = mysql.connection.cursor()
-            cursor.execute("SELECT id, nombre, email, contraseña WHERE email = %s", (email,))
-            user = cursor.fectone()
+            cursor.execute("SELECT id, nombre, email, contraseña FROM Usuario WHERE email = %s", (email,))
+            user = cursor.fetchone()
             cursor.close()
 
-        if user and check_password_hash(user[3], contraseña):
-            user_obj = User(user[0], user[1], user[2])
-            login_user(user_obj, remember=True)
-            return render_template('perfil.html')
+            if user and check_password_hash(user[3], contraseña):
+                user_obj = User(user[0], user[1], user[2])
+                login_user(user_obj, remember=True)
+                return render_template('perfil.html', user=current_user)
         
-        else:
-            msg = "Correo o contraseña incorrectos."
+            else:
+                msg = "Correo o contraseña incorrectos."
+        else: msg = "Añade todos los campos"
     return render_template('loger.html', mensaje = msg)
 
 #Funcion para cerrar sesion
@@ -115,12 +118,12 @@ def loger():
 @login_required
 def logout():
     logout_user()
-    return render_template('index')
+    return redirect(url_for('index'))
 
-@app.route('/perfil', methods=['GET', 'POST'])
+@app.route('/perfil')
 @login_required
 def perfil():
-    return render_template('perfil.html')
+    return render_template('perfil.html', user=current_user)
 
         
 if __name__ == "__main__":
