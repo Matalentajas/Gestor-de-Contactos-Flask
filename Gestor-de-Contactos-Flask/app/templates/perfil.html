@@ -73,12 +73,16 @@
     {% for c in contacto %}
     <div class="card mb-3">
         <div class="card-body">
-            <h5 class="card-title">{{ c[0] }} {{ c[1] }}</h5>
-            <p class="card-text"><strong>Teléfono:</strong> {{ c[3] }}</p>
-            <p class="card-text"><strong>Email:</strong> {{ c[2] }}</p>
+            <h5 class="card-title">{{ c[1] }} {{ c[2] }}</h5>
+            <p class="card-text"><strong>Teléfono:</strong> {{ c[4] }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ c[3] }}</p>
             <div class="d-flex justify-content-between">
                 <button class="btn btn-primary">Compartir</button>
-                <button class="btn btn-danger">Eliminar</button>
+
+                <form method="POST">
+                    <input type="hidden" name="contacto_id" value="{{ c[0] }}"> <!-- ID del contacto -->
+                    <button name="eliminar_contacto" class="btn btn-danger">Eliminar</button>
+                </form>                
             </div>
         </div>
     </div>

@@ -145,13 +145,21 @@ def perfil():
             else:
                 print("Error al añadir el contacto")
 
+        elif "eliminar_contacto" in request.form:
+            contacto_id = request.form["contacto_id"]
+            cursor = mysql.connection.cursor()
+            cursor.execute('DELETE FROM Contacto WHERE id = %s', (contacto_id,))
+            mysql.connection.commit()
+            cursor.close()
+            print(f"Contacto {contacto_id} eliminado con éxito")
+
     # Código que siempre se ejecuta después de manejar POST o GET
     id = current_user.id
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT nombre, apellido, email, telefono FROM contacto WHERE user_id = %s', (id,))
+    cursor.execute('SELECT id, nombre, apellido, email, telefono FROM contacto WHERE user_id = %s', (id,))
     contacto = cursor.fetchall()
     cursor.close()
-    print(contacto)
+
 
     return render_template('perfil.html', user=current_user, mostrar=mostrar, contacto=contacto)
     
