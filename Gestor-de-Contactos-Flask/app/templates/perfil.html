@@ -11,7 +11,15 @@
 <section class="navbar navbar-expand-lg bg-info bg-opacity-25">
     <!-- Nav de contactos -->
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Añadir Contacto</a>
+        {% if mostrar == False %}
+        <form method="POST">
+        <button lass="navbar-toggler" type="submit">Añadir Contacto</button>
+        </form>
+        {% else %}
+        <form method="GET">
+            <button lass="navbar-toggler" type="submit">X</button>
+        </form>
+        {% endif %}        
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -20,8 +28,41 @@
             <button class="btn btn-outline-success" type="submit">Buscar</button>
         </form>
     </div>
-    <!-- Fin Nav Contactos -->
-
-    
 </section>
+    <!-- Fin Nav Contactos -->
+    <!-- Formulario para Añadir contactos -->
+
+    {% if mostrar %}
+
+    <form method="POST">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Introduce tu nombre" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="apellido" class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Introduce tu apellido" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="ejemplo@correo.com" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="number" class="form-control" id="telefono" name="telefono" placeholder="987654321" required>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg w-100">Añadir Contacto</button>
+        </div>
+
+    </form>
+    <!-- Fin formulario para Añadir contactos -->
+
+    {% endif %}
+
+
+
 {% endblock %}

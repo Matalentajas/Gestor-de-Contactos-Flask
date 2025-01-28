@@ -120,11 +120,13 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/perfil')
+@app.route('/perfil', methods=['GET', 'POST'])
 @login_required
 def perfil():
-    return render_template('perfil.html', user=current_user)
-
-        
+    mostrar = False
+    if request.method == 'POST':
+        mostrar = True
+    return render_template('perfil.html',user=current_user, mostrar = mostrar)
+    
 if __name__ == "__main__":
     app.run(debug=True)
