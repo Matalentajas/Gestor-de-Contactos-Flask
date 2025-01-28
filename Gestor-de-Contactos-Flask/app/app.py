@@ -126,8 +126,8 @@ def perfil():
     mostrar = False
 
     if request.method == 'POST':
+        # Alternar entre mostrar y ocultar el formulario al darle al boton
         if 'aoform' in request.form:
-            # Alternar entre mostrar y ocultar el formulario
             mostrar = request.form.get('mostrar') != 'True'
         elif 'guardar_contacto' in request.form:
             nombre = request.form.get('nombre')
@@ -151,13 +151,9 @@ def perfil():
     cursor.execute('SELECT nombre, apellido, email, telefono FROM contacto WHERE user_id = %s', (id,))
     contacto = cursor.fetchall()
     cursor.close()
+    print(contacto)
 
     return render_template('perfil.html', user=current_user, mostrar=mostrar, contacto=contacto)
-
-
-        
-
-
-        
+    
 if __name__ == "__main__":
     app.run(debug=True)
