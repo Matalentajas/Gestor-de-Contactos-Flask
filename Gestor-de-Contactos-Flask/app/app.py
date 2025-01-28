@@ -124,9 +124,28 @@ def logout():
 @login_required
 def perfil():
     mostrar = False
+
     if request.method == 'POST':
-        mostrar = True
+        if 'aoform' in request.form:
+            # Alternar entre mostrar y ocultar el formulario
+            mostrar = request.form.get('mostrar') != 'True'
+        elif 'guardar_contacto' in request.form:
+            nombre = request.form.get('nombre')
+            apellido = request.form.get('apellido')
+            email = request.form.get('email')
+            telefono = request.form.get('telefono')
+
+            if nombre and apellido and email and telefono:
+                cursor = mysql.connection.cursor()
+                cursor.execute('INSERT INTO Contacto (nombre, apellido, email, telefono) VALUES (%s, %s, %s, %s)', (nombre, apellido, email, telefono))
+                mysql.connection.commit()
+                cursor.close()
+                print("Contacto guardado con exito")
+                mostrar = False
+            else:
+                print("Error al añadir el contacto")
     return render_template('perfil.html',user=current_user, mostrar = mostrar)
+
     
 if __name__ == "__main__":
     app.run(debug=True)
