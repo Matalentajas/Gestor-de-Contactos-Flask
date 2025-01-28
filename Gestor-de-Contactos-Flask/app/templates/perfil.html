@@ -33,7 +33,6 @@
     <!-- Formulario para Añadir contactos -->
 
     {% if mostrar %}
-
     <form method="POST">
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
@@ -60,9 +59,27 @@
 
     </form>
     <!-- Fin formulario para Añadir contactos -->
-
     {% endif %}
 
-
+    {% if contacto %}
+    <div class="modal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ contacto[0][0] }} {{ contacto[0][1] }}</h5>
+            </div>
+            <div class="modal-body">
+              <p>Email: {{ contacto[0][2] }}</p> <!-- contacto[0][2] es el email -->
+              <p>Teléfono: {{ contacto[0][3] }}</p> <!-- contacto[0][3] es el teléfono -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Borrar Contacto</button>
+            </div>
+          </div>
+        </div>
+      </div>
+{% else %}
+    <p>No tienes contactos guardados.</p>
+{% endif %}
 
 {% endblock %}
