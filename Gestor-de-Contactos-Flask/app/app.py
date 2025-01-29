@@ -105,7 +105,7 @@ def loger():
             if user and check_password_hash(user[3], contraseña):
                 user_obj = User(user[0], user[1], user[2])
                 login_user(user_obj, remember=True)
-                return render_template('perfil.html', user=current_user)
+                return redirect(url_for('perfil'))
         
             else:
                 msg = "Correo o contraseña incorrectos."
@@ -124,9 +124,11 @@ def logout():
 @login_required
 def perfil():
     mostrar = False
+    mostrar_editar = False
+    contactos = {}  # Inicializar la variable contactos antes de cualquier uso
 
     if request.method == 'POST':
-        # Alternar entre mostrar y ocultar el formulario al darle al boton
+        # Alternar entre mostrar y ocultar el formulario al darle al botón
         if 'aoform' in request.form:
             mostrar = request.form.get('mostrar') != 'True'
         elif 'guardar_contacto' in request.form:
@@ -153,6 +155,43 @@ def perfil():
             cursor.close()
             print(f"Contacto {contacto_id} eliminado con éxito")
 
+        elif "editar" in request.form:
+            mostrar_editar = request.form.get('mostrar') != 'True'
+            editar_id = request.form["editar_id"]
+            cursor = mysql.connection.cursor()
+            cursor.execute('SELECT id, nombre, apellido, email, telefono FROM Contacto WHERE id = %s AND user_id = %s', (editar_id, current_user.id))
+            contacto_tupla = cursor.fetchone()
+            cursor.close()
+
+            if contacto_tupla:
+                contactos = {
+                    "id": contacto_tupla[0],
+                    "nombre": contacto_tupla[1],
+                    "apellido": contacto_tupla[2],
+                    "email": contacto_tupla[3],
+                    "telefono": str(contacto_tupla[4])
+                }
+                print(contactos)
+            else:
+                # Aquí asignas un valor vacío si no se encuentran datos del contacto
+                contactos = {}
+
+        elif "actualizar_contacto" in request.form:
+            contacto_id = request.form["contacto_id"]
+            nombre = request.form.get('nombre')
+            apellido = request.form.get('apellido')
+            email = request.form.get('email')
+            telefono = request.form.get('telefono')
+
+            if nombre and apellido and email and telefono:
+                cursor = mysql.connection.cursor()
+                cursor.execute("""UPDATE Contacto SET nombre = %s, apellido = %s, email = %s, telefono = %s WHERE id = %s AND user_id = %s""",
+                               (nombre, apellido, email, telefono, contacto_id, current_user.id))
+                mysql.connection.commit()
+                cursor.close()
+                mostrar_editar = False
+                print("Contacto actualizado con éxito")
+
     # Código que siempre se ejecuta después de manejar POST o GET
     id = current_user.id
     cursor = mysql.connection.cursor()
@@ -160,8 +199,8 @@ def perfil():
     contacto = cursor.fetchall()
     cursor.close()
 
+    return render_template('perfil.html', user=current_user, mostrar=mostrar, contacto=contacto, mostrar_editar=mostrar_editar, contactos=contactos)
 
-    return render_template('perfil.html', user=current_user, mostrar=mostrar, contacto=contacto)
     
 if __name__ == "__main__":
     app.run(debug=True)

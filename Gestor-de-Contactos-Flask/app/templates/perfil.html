@@ -68,7 +68,7 @@
     <!-- Fin formulario para Añadir contactos -->
     {% endif %}
 
-
+    <!-- Visualización de contactos -->
     {% if contacto and contacto|length > 0 %}
     {% for c in contacto %}
     <div class="card mb-3">
@@ -77,19 +77,62 @@
             <p class="card-text"><strong>Teléfono:</strong> {{ c[4] }}</p>
             <p class="card-text"><strong>Email:</strong> {{ c[3] }}</p>
             <div class="d-flex justify-content-between">
-                <button class="btn btn-primary">Compartir</button>
-
+                {% if mostrar_editar == False %}
                 <form method="POST">
-                    <input type="hidden" name="contacto_id" value="{{ c[0] }}"> <!-- ID del contacto -->
+                    <input type="hidden" name="editar_id" value="{{ c[0] }}">
+                    <button name="editar" class="btn btn-primary">Editar</button>
+                </form>
+                {% else %}
+                <form method="GET">
+                    <button class="btn btn-outline-danger" lass="navbar-toggler" type="submit">X</button>
+                </form>
+                {% endif %}   
+                <form method="POST">
+                    <input type="hidden" name="contacto_id" value="{{ c[0] }}">
                     <button name="eliminar_contacto" class="btn btn-danger">Eliminar</button>
                 </form>                
             </div>
         </div>
     </div>
     {% endfor %}
-{% else %}
-    <p>No tienes contactos guardados.</p>
-{% endif %}
+    {% else %}
+        <p>No tienes contactos guardados.</p>
+    {% endif %}
 
+    <!-- Fin de contactos -->
+    <!-- Inicio de editar contactos -->
+
+    {% if mostrar_editar %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Editar contacto</h5>
+            <form method="POST">
+                <input type="hidden" name="contacto_id" value="{{ contactos.id }}">
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ contactos.nombre }}" required>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <input type="text" class="form-control" id="apellido" name="apellido" value="{{ contactos.apellido }}" required>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ contactos.email }}" required>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="number" class="form-control" id="telefono" name="telefono" value="{{ contactos.telefono }}" required>
+                </div>
+    
+                <button name="actualizar_contacto" type="submit" class="btn btn-success">Actualizar contacto</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    
 
 {% endblock %}
