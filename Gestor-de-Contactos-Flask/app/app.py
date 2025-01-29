@@ -15,7 +15,7 @@ login_manager.init_app(app)
 
 # Configuración de la base de datos
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_USER'] = 'Arturo'
 app.config['MYSQL_PASSWORD'] = 'Root'
 app.config['MYSQL_DB'] = 'gestor_contactos'
 mysql = MySQL(app)
