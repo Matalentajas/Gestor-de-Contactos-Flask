@@ -142,10 +142,8 @@ def perfil():
                 cursor.execute('INSERT INTO Contacto (nombre, apellido, email, telefono, user_id) VALUES (%s, %s, %s, %s, %s)', (nombre, apellido, email, telefono, current_user.id))
                 mysql.connection.commit()
                 cursor.close()
-                print("Contacto guardado con éxito")
                 mostrar = False
-            else:
-                print("Error al añadir el contacto")
+
 
         elif "eliminar_contacto" in request.form:
             contacto_id = request.form["contacto_id"]
@@ -153,7 +151,6 @@ def perfil():
             cursor.execute('DELETE FROM Contacto WHERE id = %s', (contacto_id,))
             mysql.connection.commit()
             cursor.close()
-            print(f"Contacto {contacto_id} eliminado con éxito")
 
         elif "editar" in request.form:
             mostrar_editar = request.form.get('mostrar') != 'True'
@@ -171,7 +168,7 @@ def perfil():
                     "email": contacto_tupla[3],
                     "telefono": str(contacto_tupla[4])
                 }
-                print(contactos)
+                
             else:
                 # Aquí asignas un valor vacío si no se encuentran datos del contacto
                 contactos = {}
@@ -190,7 +187,6 @@ def perfil():
                 mysql.connection.commit()
                 cursor.close()
                 mostrar_editar = False
-                print("Contacto actualizado con éxito")
 
     # Código que siempre se ejecuta después de manejar POST o GET
     id = current_user.id
@@ -201,6 +197,9 @@ def perfil():
 
     return render_template('perfil.html', user=current_user, mostrar=mostrar, contacto=contacto, mostrar_editar=mostrar_editar, contactos=contactos)
 
+@app.errorhandler(404)
+def pagina_no_encontrada(error):
+    return render_template("404.html"), 404
     
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Página No Encontrada{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <img src="https://faym.co/post/static/media/errorImg.970c958bc47656e365f7.gif" alt="" class="img-fluid mb-4">
+    <h2 class="mb-4">Oops! Página no encontrada.</h2>
+    <p class="lead">Parece que la página que buscas no existe.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Volver al inicio</a>
+</div>
+
+{% endblock %}
