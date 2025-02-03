@@ -2,27 +2,29 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_mysqldb import MySQL
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
 from dotenv import load_dotenv
+import os
 
-# Cargar variables de entorno desde el archivo .env
+# Cargar variables de entorno
 load_dotenv()
 
-# Inicializar la aplicación Flask
 app = Flask(__name__)
+app.config['MYSQL_CONNECTION_TIMEOUT'] = 300
+
+# Clave secreta
+app.secret_key = os.getenv("SECRET_KEY")
 
 # Configuración de Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Configuración de la base de datos desde variables de entorno
-app.config["MYSQL_HOST"] = os.getenv("MYSQL_HOST")
-app.config["MYSQL_USER"] = os.getenv("MYSQL_USER")
-app.config["MYSQL_PASSWORD"] = os.getenv("MYSQL_PASSWORD")
-app.config["MYSQL_DB"] = os.getenv("MYSQL_DB")
-app.config["MYSQL_PORT"] = int(os.getenv("MYSQL_PORT", 3306))
-app.config["MYSQL_CURSORCLASS"] = "DictCursor"  # Para obtener resultados como diccionario
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+# Configuración de la base de datos
+app.config['MYSQL_HOST'] = os.getenv("MYSQL_ADDON_HOST")
+app.config['MYSQL_USER'] = os.getenv("MYSQL_ADDON_USER")
+app.config['MYSQL_PASSWORD'] = os.getenv("MYSQL_ADDON_PASSWORD")
+app.config['MYSQL_DB'] = os.getenv("MYSQL_ADDON_DB")
+mysql = MySQL(app)
+
 
 # Inicializar MySQL
 mysql = MySQL(app)
@@ -41,7 +43,7 @@ def load_user(user_id):
     cursor.close()
     
     if user:
-        return User(user[0], user[1], user[2])  # Devuelve una instancia de User
+        return User(user[0], user[1], user[2])
     return None
 
 ########################
@@ -62,26 +64,22 @@ def register():
         email = request.form.get('email')
         contraseña = request.form.get('contraseña')
 
-        # Verificación de campos vacíos
         if not nombre or not apellido or not email or not contraseña:
             flash("Por favor, completa todos los campos.", "error")
             return redirect(url_for('register'))
 
         cursor = mysql.connection.cursor()
 
-        # Comprobamos si el correo ya existe en la base de datos
         cursor.execute("SELECT * FROM Usuario WHERE email = %s", (email,))
         existing_user = cursor.fetchone()
 
-        if existing_user:  # Si se encontró un usuario
+        if existing_user:
             flash("El correo electrónico ya está registrado. Intenta con otro.", "error")
             cursor.close()
             return redirect(url_for('register'))
 
-        # Cifrar la contraseña antes de guardarla
         hashed_password = generate_password_hash(contraseña)
 
-        # Insertar el nuevo usuario en la base de datos
         cursor.execute(
             'INSERT INTO Usuario(nombre, apellido, email, contraseña) VALUES (%s, %s, %s, %s)', 
             (nombre, apellido, email, hashed_password)
@@ -91,9 +89,9 @@ def register():
         cursor.close()
 
         flash("¡Registro exitoso! Ya puedes iniciar sesión.", "success")
-        return redirect(url_for('loger'))  # Asegúrate de que la ruta 'loger' esté correctamente definida
+        return redirect(url_for('loger'))
 
-    return render_template('register.html')  # Aquí se renderiza el formulario de registro
+    return render_template('register.html')
 
 
 ##LOGER
@@ -104,16 +102,13 @@ def loger():
         email = request.form.get('email')
         contraseña = request.form.get('contraseña')
         
-        # Verificar si ambos campos fueron proporcionados
         if email and contraseña:
             cursor = mysql.connection.cursor()
             cursor.execute("SELECT id, nombre, email, contraseña FROM Usuario WHERE email = %s", (email,))
             user = cursor.fetchone()
             cursor.close()
 
-            # Verificar si el usuario existe
             if user:
-                # Comparar la contraseña ingresada con la almacenada
                 if check_password_hash(user[3], contraseña):
                     user_obj = User(user[0], user[1], user[2])
                     login_user(user_obj, remember=True)
@@ -127,7 +122,6 @@ def loger():
 
     return render_template('loger.html', mensaje=msg)
 
-# Funcion para cerrar sesion
 @app.route('/logout')
 @login_required
 def logout():
@@ -139,7 +133,7 @@ def logout():
 def perfil():
     mostrar = False
     mostrar_editar = False
-    contactos = {}  # Inicializar la variable contactos antes de cualquier uso
+    contactos = {}
 
     if request.method == 'POST':
         # Alternar entre mostrar y ocultar el formulario al darle al botón
@@ -182,7 +176,6 @@ def perfil():
                     "telefono": str(contacto_tupla[4])
                 }
             else:
-                # Aquí asignas un valor vacío si no se encuentran datos del contacto
                 contactos = {}
 
         elif "actualizar_contacto" in request.form:
@@ -213,7 +206,7 @@ def perfil():
 def test_db():
     try:
         cursor = mysql.connection.cursor()
-        cursor.execute("SELECT DATABASE();")  # Verificar conexión
+        cursor.execute("SELECT DATABASE();")
         db_name = cursor.fetchone()[0]
         cursor.close()
         return f"Conexión exitosa a la base de datos: {db_name}"
