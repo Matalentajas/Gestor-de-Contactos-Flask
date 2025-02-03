@@ -8,12 +8,13 @@
         <div class="col-6">
             <h1 class="text-center">Iniciar sesión</h1>
 
-            <!-- Mensaje de resultado -->
+            <!-- Dentro de loger.html -->
             {% if mensaje %}
-                <div class="alert alert-info text-center" role="alert">
+                <div class="alert alert-danger">
                     {{ mensaje }}
                 </div>
             {% endif %}
+
 
             <!-- Formulario de inicio de sesión -->
             <form method="POST">

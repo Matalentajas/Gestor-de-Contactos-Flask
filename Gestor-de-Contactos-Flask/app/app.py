@@ -1,23 +1,30 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_mysqldb import MySQL
-#Importaciones para Login
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-#Importacion para generar seguridad en las contraseñas de los usuarios usando Hash
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
+from dotenv import load_dotenv
 
+# Cargar variables de entorno desde el archivo .env
+load_dotenv()
+
+# Inicializar la aplicación Flask
 app = Flask(__name__)
 
-#Clave secreta
-app.secret_key = "f18440b8772ce1f74c8877a8616dc190624015e870e9ac8d868c9b42b7027a7b"
 # Configuración de Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Configuración de la base de datos
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'Arturo'
-app.config['MYSQL_PASSWORD'] = 'Root'
-app.config['MYSQL_DB'] = 'gestor_contactos'
+# Configuración de la base de datos desde variables de entorno
+app.config["MYSQL_HOST"] = os.getenv("MYSQL_HOST")
+app.config["MYSQL_USER"] = os.getenv("MYSQL_USER")
+app.config["MYSQL_PASSWORD"] = os.getenv("MYSQL_PASSWORD")
+app.config["MYSQL_DB"] = os.getenv("MYSQL_DB")
+app.config["MYSQL_PORT"] = int(os.getenv("MYSQL_PORT", 3306))
+app.config["MYSQL_CURSORCLASS"] = "DictCursor"  # Para obtener resultados como diccionario
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+
+# Inicializar MySQL
 mysql = MySQL(app)
 
 class User(UserMixin):
@@ -57,7 +64,7 @@ def register():
 
         # Verificación de campos vacíos
         if not nombre or not apellido or not email or not contraseña:
-            flash("Por favor, complete todos los campos.", "error")
+            flash("Por favor, completa todos los campos.", "error")
             return redirect(url_for('register'))
 
         cursor = mysql.connection.cursor()
@@ -66,11 +73,11 @@ def register():
         cursor.execute("SELECT * FROM Usuario WHERE email = %s", (email,))
         existing_user = cursor.fetchone()
 
-        if existing_user:
+        if existing_user:  # Si se encontró un usuario
             flash("El correo electrónico ya está registrado. Intenta con otro.", "error")
             cursor.close()
             return redirect(url_for('register'))
-        
+
         # Cifrar la contraseña antes de guardarla
         hashed_password = generate_password_hash(contraseña)
 
@@ -84,9 +91,10 @@ def register():
         cursor.close()
 
         flash("¡Registro exitoso! Ya puedes iniciar sesión.", "success")
-        return redirect(url_for('loger'))
+        return redirect(url_for('loger'))  # Asegúrate de que la ruta 'loger' esté correctamente definida
 
-    return render_template('register.html')
+    return render_template('register.html')  # Aquí se renderiza el formulario de registro
+
 
 ##LOGER
 @app.route("/loger", methods=['GET', 'POST'])
@@ -96,24 +104,30 @@ def loger():
         email = request.form.get('email')
         contraseña = request.form.get('contraseña')
         
+        # Verificar si ambos campos fueron proporcionados
         if email and contraseña:
             cursor = mysql.connection.cursor()
             cursor.execute("SELECT id, nombre, email, contraseña FROM Usuario WHERE email = %s", (email,))
             user = cursor.fetchone()
             cursor.close()
 
-            if user and check_password_hash(user[3], contraseña):
-                user_obj = User(user[0], user[1], user[2])
-                login_user(user_obj, remember=True)
-                return redirect(url_for('perfil'))
-        
+            # Verificar si el usuario existe
+            if user:
+                # Comparar la contraseña ingresada con la almacenada
+                if check_password_hash(user[3], contraseña):
+                    user_obj = User(user[0], user[1], user[2])
+                    login_user(user_obj, remember=True)
+                    return redirect(url_for('perfil'))
+                else:
+                    msg = "Correo o contraseña incorrectos."
             else:
-                msg = "Correo o contraseña incorrectos."
-        else: msg = "Añade todos los campos"
-    return render_template('loger.html', mensaje = msg)
+                msg = "Correo no encontrado."
+        else:
+            msg = "Por favor, completa todos los campos."
 
-#Funcion para cerrar sesion
+    return render_template('loger.html', mensaje=msg)
 
+# Funcion para cerrar sesion
 @app.route('/logout')
 @login_required
 def logout():
@@ -144,7 +158,6 @@ def perfil():
                 cursor.close()
                 mostrar = False
 
-
         elif "eliminar_contacto" in request.form:
             contacto_id = request.form["contacto_id"]
             cursor = mysql.connection.cursor()
@@ -168,7 +181,6 @@ def perfil():
                     "email": contacto_tupla[3],
                     "telefono": str(contacto_tupla[4])
                 }
-                
             else:
                 # Aquí asignas un valor vacío si no se encuentran datos del contacto
                 contactos = {}
@@ -191,15 +203,26 @@ def perfil():
     # Código que siempre se ejecuta después de manejar POST o GET
     id = current_user.id
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT id, nombre, apellido, email, telefono FROM contacto WHERE user_id = %s', (id,))
+    cursor.execute('SELECT id, nombre, apellido, email, telefono FROM Contacto WHERE user_id = %s', (id,))
     contacto = cursor.fetchall()
     cursor.close()
 
     return render_template('perfil.html', user=current_user, mostrar=mostrar, contacto=contacto, mostrar_editar=mostrar_editar, contactos=contactos)
 
+@app.route("/test_db")
+def test_db():
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT DATABASE();")  # Verificar conexión
+        db_name = cursor.fetchone()[0]
+        cursor.close()
+        return f"Conexión exitosa a la base de datos: {db_name}"
+    except Exception as e:
+        return f"Error conectando a la base de datos: {str(e)}"
+
 @app.errorhandler(404)
 def pagina_no_encontrada(error):
-    return render_template("404.html"), 404
+    return render_template("404.html", error=error), 404
     
 if __name__ == "__main__":
     app.run(debug=True)

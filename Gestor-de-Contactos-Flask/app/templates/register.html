@@ -9,20 +9,23 @@
             <h2 class="text-center mb-4">Crea tu cuenta</h2>
 
             <!-- Mensaje de éxito -->
-            {% if mensaje_ok %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>{{ mensaje_ok }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endif %}
-
-            <!-- Mensaje de error -->
-            {% if mensaje_no %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>{{ mensaje_no }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endif %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'success' %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <strong>{{ message }}</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% elif category == 'error' %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>{{ message }}</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
             <!-- Formulario de registro -->
             <form action="{{ url_for('register') }}" method="POST">
