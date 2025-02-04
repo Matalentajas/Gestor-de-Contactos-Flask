@@ -23,8 +23,7 @@ app.config['MYSQL_HOST'] = os.getenv("MYSQL_ADDON_HOST")
 app.config['MYSQL_USER'] = os.getenv("MYSQL_ADDON_USER")
 app.config['MYSQL_PASSWORD'] = os.getenv("MYSQL_ADDON_PASSWORD")
 app.config['MYSQL_DB'] = os.getenv("MYSQL_ADDON_DB")
-mysql = MySQL(app)
-
+app.config['MYSQL_ADDON_PORT'] = os.getenv("MYSQL_ADDON_PORT")
 
 # Inicializar MySQL
 mysql = MySQL(app)
