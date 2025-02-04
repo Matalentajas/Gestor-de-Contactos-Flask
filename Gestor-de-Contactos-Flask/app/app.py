@@ -8,7 +8,7 @@ import os
 # Cargar variables de entorno
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='src/templates')
 app.config['MYSQL_CONNECTION_TIMEOUT'] = 300
 
 # Clave secreta
